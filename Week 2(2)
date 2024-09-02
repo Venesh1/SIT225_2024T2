@@ -1,0 +1,19 @@
+import matplotlib.pyplot as plt
+import pandas as pd
+
+# Load the CSV data
+data = pd.read_csv('dht22_data.csv')
+
+# Convert timestamp to a datetime format if needed
+data['timestamp'] = pd.to_datetime(data['timestamp'], format='%Y%m%d%H%M%S')
+
+# Plot temperature and humidity
+plt.figure(figsize=(10, 5))
+plt.plot(data['timestamp'], data['temperature'], label='Temperature (°C)')
+plt.plot(data['timestamp'], data['humidity'], label='Humidity (%)')
+plt.xlabel('Time')
+plt.ylabel('Measurements')
+plt.title('Temperature and Humidity Over Time')
+plt.legend()
+plt.grid(True)
+plt.show()
