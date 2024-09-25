@@ -1,0 +1,32 @@
+import firebase_admin
+from firebase_admin import credentials, db
+import time
+
+# Initialize Firebase Admin SDK
+cred = credentials.Certificate(r'C:\Users\obaid\OneDrive\Desktop\New folder\serviceAccountKey.json')
+firebase_admin.initialize_app(cred, {
+    'databaseURL': 'https://venesh-c20b5-default-rtdb.firebaseio.com'
+})
+
+# Reference to the sensor data node
+ref = db.reference("/sensors")
+
+# Store last seen data to compare changes
+last_data = None
+
+def poll_for_changes():
+    global last_data
+    while True:
+        # Fetch current data
+        current_data = ref.get()
+        
+        if current_data != last_data:
+            # If data has changed, print it
+            print("Data changed:", current_data)
+            last_data = current_data  # Update last seen data
+        
+        # Poll every 5 seconds
+        time.sleep(5)
+
+# Start polling
+poll_for_changes()
