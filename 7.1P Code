@@ -1,0 +1,24 @@
+import pandas as pd
+import numpy as np from sklearn.linear_model import LinearRegression
+import matplotlib.pyplot as plt
+# Load the CSV data into a DataFrame
+df = pd.read_csv('C:/Users/Obaid/Downloads/full_health_data.csv')
+# Define the feature and target variable
+x = df [['Duration']] # Feature (must be DataFrame) y = df['Calorie_Burnage'] # Target (Series)
+# Create a linear regression model model = LinearRegression()
+# Train the model model.fit(x, y)
+# Generate test data (ensure it's in DataFrame format)
+duration_min = df['Duration'].min()
+duration_max = df['Duration'].max()
+test_durations = pd.DataFrame({'Duration': np.linspace(duration_min, duration_max, 100)})
+# Predict Calorie Burnage for test durations predicted_calories model.predict(test_durations)
+# Plot the data and regression line
+plt.figure(figsize=(10, 6))
+.scatter(df['Duration'], df['Calorie_Burnage'], color='blue', label='Actual Data')
+plt.plot(test_durations, predicted_calories, color='red', linewidth=2, label='Regression Line')
+plt.xlabel('Duration')
+plt.title('Linear Regression: Duration vs Calorie Burnage')
+plt.ylabel('Calorie Burnage')
+plt.legend()
+plt.grid(True)
+plt.show()
