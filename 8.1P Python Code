@@ -1,0 +1,29 @@
+import datetime
+import csv
+
+# Callback functions for each accelerometer axis
+def on_accelerometer_x_received(data):
+    timestamp = datetime.datetime.now()
+    with open('accelerometer_x.csv', 'a', newline='') as file:
+        writer = csv.writer(file)
+        writer.writerow([timestamp, data])
+    print(f"X Data: {data} at {timestamp}")
+
+def on_accelerometer_y_received(data):
+    timestamp = datetime.datetime.now()
+    with open('accelerometer_y.csv', 'a', newline='') as file:
+        writer = csv.writer(file)
+        writer.writerow([timestamp, data])
+    print(f"Y Data: {data} at {timestamp}")
+
+def on_accelerometer_z_received(data):
+    timestamp = datetime.datetime.now()
+    with open('accelerometer_z.csv', 'a', newline='') as file:
+        writer = csv.writer(file)
+        writer.writerow([timestamp, data])
+    print(f"Z Data: {data} at {timestamp}")
+
+# Mocking function calls - Replace these with actual function calls from your Arduino Cloud setup
+on_accelerometer_x_received(0.5)  # Replace with actual data received
+on_accelerometer_y_received(1.2)  # Replace with actual data received
+on_accelerometer_z_received(-0.7) # Replace with actual data received
