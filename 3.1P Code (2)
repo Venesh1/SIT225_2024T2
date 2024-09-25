@@ -1,0 +1,21 @@
+import dash
+from dash import dcc
+from dash import html
+import random
+import time
+
+# Initialize the Dash app
+app = dash.Dash(_name_)
+
+# Define a data source generator
+def data_generator():
+    while True:
+        yield random.random()
+        time.sleep(1)  # Simulate data arrival every second
+
+# Use the wrapper function to create a real-time graph
+real_time_plot(app, data_generator, graph_type='line', update_interval=1000)
+
+# Run the app
+if _name_ == '_main_':
+    app.run_server(debug=True)
