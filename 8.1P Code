@@ -1,0 +1,36 @@
+python code 
+import datetime
+import csv
+
+# Function to handle data from all three accelerometer axes and store in a single CSV file
+def store_combined_accelerometer_data(x_data, y_data, z_data):
+    timestamp = datetime.datetime.now()
+    with open('combined_accelerometer_data.csv', 'a', newline='') as file:
+        writer = csv.writer(file)
+        writer.writerow([timestamp, x_data, y_data, z_data])
+    print(f"Data stored: {timestamp}, X={x_data}, Y={y_data}, Z={z_data}")
+
+# Simulate reading from the files and storing the combined data
+def process_combined_accelerometer_data(x_file, y_file, z_file):
+    with open(x_file, 'r') as x_f, open(y_file, 'r') as y_f, open(z_file, 'r') as z_f:
+        x_reader = csv.reader(x_f)
+        y_reader = csv.reader(y_f)
+        z_reader = csv.reader(z_f)
+        
+        next(x_reader)  # Skip header
+        next(y_reader)  # Skip header
+        next(z_reader)  # Skip header
+        
+        for x_row, y_row, z_row in zip(x_reader, y_reader, z_reader):
+            x_value = float(x_row[1])
+            y_value = float(y_row[1])
+            z_value = float(z_row[1])
+            store_combined_accelerometer_data(x_value, y_value, z_value)
+
+# Paths to the uploaded files
+accel_x_file = 'C:/Users/obaid/Downloads/realme 6i Thing-Accelerometer_X.csv'
+accel_y_file = 'C:/Users/obaid/Downloads/realme 6i Thing-Accelerometer_Y.csv'
+accel_z_file = 'C:/Users/obaid/Downloads/realme 6i Thing-Accelerometer_Z.csv'
+
+# Process and combine the data
+process_combined_acceleromet
