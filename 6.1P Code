@@ -1,0 +1,145 @@
+import dash
+from dash import dcc, html, Input, Output, State
+import plotly.express as px
+import pandas as pd
+import dash_table
+
+# Load the data
+df = pd.read_csv('gyroscope_data.csv')
+
+# Initialize the Dash app
+app = dash.Dash(_name_)
+
+app.layout = html.Div([
+    html.H1('Gyroscope Data Dashboard'),
+
+    html.Div([
+        html.Label('Select Graph Type:'),
+        dcc.Dropdown(
+            id='graph-type',
+            options=[
+                {'label': 'Line Chart', 'value': 'line'},
+                {'label': 'Scatter Plot', 'value': 'scatter'},
+                {'label': 'Distribution Plot', 'value': 'histogram'}
+            ],
+            value='line'
+        )
+    ]),
+
+    html.Div([
+        html.Label('Select Data Variables:'),
+        dcc.Dropdown(
+            id='data-variables',
+            options=[
+                {'label': 'X', 'value': 'x'},
+                {'label': 'Y', 'value': 'y'},
+                {'label': 'Z', 'value': 'z'},
+                {'label': 'X, Y, Z', 'value': 'xyz'}
+            ],
+            value='xyz'
+        )
+    ]),
+
+    html.Div([
+        html.Label('Number of Samples:'),
+        dcc.Input(
+            id='num-samples',
+            type='number',
+            value=100,
+            min=1,
+            step=1
+        ),
+        html.Button('Update', id='update-button'),
+        html.Button('Previous', id='prev-button'),
+        html.Button('Next', id='next-button')
+    ]),
+
+    dcc.Graph(id='graph'),
+
+    html.Div([
+        html.H3('Data Summary'),
+        dash_table.DataTable(
+            id='data-summary',
+            columns=[{'name': 'Statistic', 'id': 'statistic'}, {'name': 'Value', 'id': 'value'}]
+        )
+    ])
+])
+
+# Callbacks
+@app.callback(
+    Output('graph', 'figure'),
+    Output('data-summary', 'data'),
+    Input('update-button', 'n_clicks'),
+    Input('graph-type', 'value'),
+    Input('data-variables', 'value'),
+    Input('num-samples', 'value'),
+    State('graph', 'relayoutData')
+)
+def update_graph(n_clicks, graph_type, data_variables, num_samples, relayoutData):
+    # Prepare data
+    df_filtered = df.tail(num_samples)
+
+    # Create the graph
+    if graph_type == 'line':
+        fig = px.line(df_filtered, x=df_filtered.index, y=data_variables.split(',') if data_variables != 'xyz' else ['x', 'y', 'z'])
+    elif graph_type == 'scatter':
+        fig = px.scatter(df_filtered, x='x', y='y', color='z')
+    elif graph_type == 'histogram':
+        fig = px.histogram(df_filtered, x='x', color='z')
+    
+    # Create summary
+    summary = {
+        'statistic': ['Mean X', 'Mean Y', 'Mean Z', 'Standard Deviation X', 'Standard Deviation Y', 'Standard Deviation Z'],
+        'value': [
+            df_filtered['x'].mean(),
+            df_filtered['y'].mean(),
+            df_filtered['z'].mean(),
+            df_filtered['x'].std(),
+            df_filtered['y'].std(),
+            df_filtered['z'].std()
+        ]
+    }
+    
+    return fig, summary
+
+@app.callback(
+    Output('data-summary', 'data'),
+    Input('prev-button', 'n_clicks'),
+    Input('next-button', 'n_clicks'),
+    State('num-samples', 'value'),
+    State('graph', 'relayoutData')
+)
+def navigate_samples(prev_clicks, next_clicks, num_samples, relayoutData):
+    # Navigation logic
+    if relayoutData and 'xaxis.range' in relayoutData:
+        current_range = relayoutData['xaxis.range']
+        start_index = int(current_range[0])
+        end_index = int(current_range[1])
+        
+        if prev_clicks:
+            start_index = max(0, start_index - num_samples)
+            end_index = start_index + num_samples
+        elif next_clicks:
+            start_index = min(len(df), end_index)
+            end_index = min(len(df), start_index + num_samples)
+        
+        df_filtered = df.iloc[start_index:end_index]
+        
+        summary = {
+            'statistic': ['Mean X', 'Mean Y', 'Mean Z', 'Standard Deviation X', 'Standard Deviation Y', 'Standard Deviation Z'],
+            'value': [
+                df_filtered['x'].mean(),
+                df_filtered['y'].mean(),
+                df_filtered['z'].mean(),
+                df_filtered['x'].std(),
+                df_filtered['y'].std(),
+                df_filtered['z'].std()
+            ]
+        }
+        
+        return summary
+    
+    return dash.no_update
+
+if _name_ == '_main_':
+    app.run_server(debug=True)
