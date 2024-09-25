@@ -1,0 +1,25 @@
+import pandas as pd
+import matplotlib.pyplot as plt
+
+# Load the sensor data CSV file
+sensor_data = pd.read_csv('sensor_data.csv')
+
+# Assuming the sensor data has 'temperature' and 'humidity' columns
+plt.figure(figsize=(10, 6))
+
+# Plot temperature and humidity on the same graph
+plt.plot(sensor_data['timestamp'], sensor_data['temperature'], label='Temperature (°C)', color='red')
+plt.plot(sensor_data['timestamp'], sensor_data['humidity'], label='Humidity (%)', color='blue')
+
+# Adding labels and title
+plt.xlabel('Timestamp')
+plt.ylabel('Sensor Readings')
+plt.title('Temperature and Humidity Readings from DHT22 Sensor')
+plt.legend()
+
+# Rotate x-axis labels for better readability
+plt.xticks(rotation=45)
+plt.tight_layout()
+
+# Show the plot
+plt.show()
